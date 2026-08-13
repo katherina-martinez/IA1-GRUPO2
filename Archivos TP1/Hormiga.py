@@ -97,14 +97,14 @@ class LangtonSimulation:
 
     def __init__(self, width: int = 30, height: int = 20):
         self.grid = Grid(width, height)
-        
+
         # Ubicación inicial aleatoria y orientación inicial aleatoria
         initial_position = Position(
             x=random.randint(0, width - 1),
             y=random.randint(0, height - 1)
         )
         initial_direction = random.choice(list(Direction))
-        
+
         self.ant = Ant(initial_position, initial_direction)
         self.steps = 0
 
@@ -121,13 +121,13 @@ class LangtonSimulation:
 
         # 3. Avanza un cuadrado
         self.ant.advance(self.grid.width, self.grid.height)
-        
+
         self.steps += 1
 
     def render(self) -> None:
         """Dibuja el tablero en la consola limpia usando caracteres Unicode."""
         os.system('cls' if os.name == 'nt' else 'clear')
-        
+
         color_symbols = {
             Color.WHITE: '░░',
             Color.BLACK: '██'
@@ -170,23 +170,23 @@ class LangtonSimulation:
 
 # --- Punto de Entrada Normal: Simula TODOS los pasos ---
 #if __name__ == "__main__":
-#    # Configuración de grilla 
+#    # Configuración de grilla
 #    sim = LangtonSimulation(width=60, height=40)
 #    sim.run(max_steps=99999, delay=0)
 
 # --- Bloque que permite la visualizacion de la Avenida ---
 if __name__ == "__main__":
-    #  Agrandamos el tablero 
+    #  Agrandamos el tablero
     sim = LangtonSimulation(width=120, height=60)
-    
+
     # 2. Forzamos a la hormiga a iniciar en el centro exacto para darle espacio
     center_pos = Position(x=60, y=30)
     sim.ant = Ant(center_pos, Direction.NORTH)
-    
+
     # 3. Avance rápido: Simulamos 10,000 pasos sin renderizar ni pausas
     for _ in range(10000):
         sim.step()
-        
-    # 4. Ahora sí, comenzamos a dibujar. 
+
+    # 4. Ahora sí, comenzamos a dibujar.
     # Vas a ver a la hormiga construyendo la avenida en diagonal.
     sim.run(max_steps=7000, delay=0.03)
