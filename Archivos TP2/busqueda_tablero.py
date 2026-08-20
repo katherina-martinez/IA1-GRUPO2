@@ -1,8 +1,8 @@
 """
-Espacio de estados: tablero en forma de cruz (A..W excepto letras usadas)
+Espacio de estados: tablero en forma de cruz (A..K excepto letras usadas)
 Nodo inicial: I   |   Nodo objetivo: F
 Costo de entrar a una casilla estándar = 1
-Costo de entrar a la casilla W = 30
+Costo de entrar a la casilla H = 30
 Heurística: Distancia de Manhattan hacia F  
 Desempate: orden alfabético
 """
@@ -17,12 +17,12 @@ import heapq
 COORDS = {
     'A': (1, 4), 'B': (1, 5),
     'C': (2, 4), 'D': (2, 5), 'E': (2, 6),
-    'G': (3, 1), 'I': (3, 2), 'W': (3, 3), 'K': (3, 4), 'M': (3, 5), 'N': (3, 6),
+    'G': (3, 1), 'I': (3, 2), 'H': (3, 3), 'K': (3, 4), 'M': (3, 5), 'N': (3, 6),
     'P': (4, 1), 'Q': (4, 2), 'R': (4, 3), 'T': (4, 4), 'F': (4, 5),
 }
 
 # Grafo de adyacencias YA filtrado por los muros rojos:
-#   C-D bloqueado, D-E bloqueado, W-R bloqueado, T-F bloqueado
+#   C-D bloqueado, D-E bloqueado, H-R bloqueado, T-F bloqueado
 GRAPH = {
     'A': ['B', 'C'],
     'B': ['A', 'D'],
@@ -30,21 +30,21 @@ GRAPH = {
     'D': ['B', 'M'],
     'E': ['N'],
     'G': ['I', 'P'],
-    'I': ['G', 'Q', 'W'],
-    'K': ['C', 'M', 'T', 'W'],
+    'I': ['G', 'Q', 'H'],
+    'K': ['C', 'M', 'T', 'H'],
     'M': ['D', 'F', 'K', 'N'],
     'N': ['E', 'M'],
     'P': ['G', 'Q'],
     'Q': ['I', 'P', 'R'],
     'R': ['Q', 'T'],
     'T': ['K', 'R'],
-    'W': ['I', 'K'],
+    'H': ['I', 'K'],
     'F': ['M'],
 }
 #constantes globales
 START = 'I'
 GOAL = 'F'
-WALL_NODE = 'W'
+WALL_NODE = 'H'
 WALL_COST = 30
 DEFAULT_COST = 1
 
@@ -95,7 +95,7 @@ def dfs(start=START, goal=GOAL, verbose=True):
     goal_found = {'flag': False}
 
     def visit(node):
-            """visita un nodo en DFS y luego lo agrega al conjunto de visitados"""
+        """visita un nodo en DFS y luego lo agrega al conjunto de visitados"""
         visited.add(node)
         order.append(node)
         if verbose:
