@@ -41,7 +41,7 @@ GRAPH = {
     'W': ['I', 'K'],
     'F': ['M'],
 }
-
+#constantes globales
 START = 'I'
 GOAL = 'F'
 WALL_NODE = 'W'
@@ -85,14 +85,17 @@ def reconstruct(parent, goal):
 # ---------------------------------------------------------------
 
 def dfs(start=START, goal=GOAL, verbose=True):
+    """Ejecuta busqueda DFS desde START hasta GOAL"""
     if verbose:
         print("\n================  DFS (Profundidad Primero)  ================")
-    visited = set()
-    parent = {start: None}
+    visited = set()  #para no repetir nodos ya visitados
+    parent = {start: None}  #se guardan los padres de cada nodo en un diccionario
+                            #el nodo inicial no tiene padre (:c)
     order = []
     goal_found = {'flag': False}
 
     def visit(node):
+            """visita un nodo en DFS y luego lo agrega al conjunto de visitados"""
         visited.add(node)
         order.append(node)
         if verbose:
@@ -100,11 +103,11 @@ def dfs(start=START, goal=GOAL, verbose=True):
         if node == goal:
             goal_found['flag'] = True
             return
-        for n in neighbors(node):          # orden alfabético = desempate
+        for n in neighbors(node):   # orden alfabético = desempate
             if goal_found['flag']:
                 return
             if n not in visited:
-                parent[n] = node
+                parent[n] = node 
                 visit(n)
 
     visit(start)
@@ -121,18 +124,19 @@ def dfs(start=START, goal=GOAL, verbose=True):
 # ---------------------------------------------------------------
 
 def greedy_search(start=START, goal=GOAL, verbose=True):
+    """Ejecuta búsqueda Greedy, siempre expande el nodo con menor heurística"""
     if verbose:
         print("\n============  GREEDY BEST-FIRST SEARCH  (f = h)  =============")
-    frontier = []
+    frontier = [] #nodo no expandido
     heapq.heappush(frontier, (heuristic(start), start))   # (h, nombre) -> desempate alfabético automático
-    in_frontier = {start}
-    closed = set()
+    in_frontier = {start}  #para identificar nodos ya expandido y evitar duplicados
+    closed = set()  #nodo ya procesado
     parent = {start: None}
     order = []
 
-    while frontier:
-        h, node = heapq.heappop(frontier)
-        in_frontier.discard(node)
+    while frontier: #mientras haya nodos en la frontera se sigue buscando
+        h, node = heapq.heappop(frontier) #se busca el nodo con menor h(n)
+        in_frontier.discard(node) #cuando el nodo se expande ya no está en la frontera
         if node in closed:
             continue
         closed.add(node)
@@ -140,7 +144,7 @@ def greedy_search(start=START, goal=GOAL, verbose=True):
         if verbose:
             print(f"Expandiendo: {node:2s} (h={h:2d}) | Frontera: {sorted(in_frontier)} | Cerrados: {sorted(closed)}")
 
-        if node == goal:
+        if node == goal: #si llegamos al nodo objetivo
             break
 
         for n in neighbors(node):
@@ -162,32 +166,33 @@ def greedy_search(start=START, goal=GOAL, verbose=True):
 # ---------------------------------------------------------------
 
 def a_star_search(start=START, goal=GOAL, verbose=True):
+    """Ejecuta busqueda A*, sumando el costo de g(n) con h(n) para elegir el próximo nodo a expandir"""
     if verbose:
         print("\n=====================  A*  (f = g + h)  =======================")
         print(f"{'Nodo':4} {'g(n)':>5} {'h(n)':>5} {'f(n)':>5}")
 
     frontier = []
-    g_score = {start: 0}
-    heapq.heappush(frontier, (g_score[start] + heuristic(start), start))
-    parent = {start: None}
-    closed = set()
-    order = []
+    g_score = {start: 0} #diccionario con el costo real desde el inicio hasta cada nodo, start es cero porque ya estoy ahí
+    heapq.heappush(frontier, (g_score[start] + heuristic(start), start)) #
+    parent = {start: None} #diccionario de padres
+    closed = set() #nodos ya expandidos
+    order = [] #orden de expansión de los nodos
 
-    while frontier:
-        f, node = heapq.heappop(frontier)
-        if node in closed:
+    while frontier: #mientras haya nodos candidatos
+        f, node = heapq.heappop(frontier) #extrae nodo con menor f(n)
+        if node in closed: #verificación para evitar procesamiento doble
             continue
         closed.add(node)
         order.append(node)
         if verbose:
             print(f"{node:4} {g_score[node]:5d} {heuristic(node):5d} {f:5d}   <- expandido | Cerrados: {sorted(closed)}")
 
-        if node == goal:
+        if node == goal: #si llegamos al nodo objetivo terminamos
             break
 
-        for n in neighbors(node):
-            tentative_g = g_score[node] + step_cost(n)
-            if tentative_g < g_score.get(n, float('inf')):
+        for n in neighbors(node): #recorremos los nodos vecinos del actual en orden alfabético
+            tentative_g = g_score[node] + step_cost(n) #costo de ir a un nodo vecino=costo para llegar al nodo actual + costo de entrar al nodo vecino
+            if tentative_g < g_score.get(n, float('inf')): #comparo el nuevo camino hallado con el conocido anteriormente
                 g_score[n] = tentative_g
                 parent[n] = node
                 heapq.heappush(frontier, (tentative_g + heuristic(n), n))
